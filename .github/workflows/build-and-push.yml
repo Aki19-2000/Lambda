@@ -1,11 +1,7 @@
 name: Build and Push Docker Images
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'services/**'
+  workflow_dispatch:
 
 jobs:
   docker:
