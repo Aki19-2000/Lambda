@@ -6,6 +6,6 @@ module "lambda" {
   source = "./modules/lambda"
 }
 
-module "ecr" {
-  source = "./modules/ecr"
-}
+#module "ecr" {
+  #source = "./modules/ecr"
+#}
