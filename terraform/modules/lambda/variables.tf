@@ -1,3 +1,8 @@
+variable "region" {
+  description = "The AWS region to deploy resources"
+  type        = string
+}
+
 variable "lambda_function_name" {
   description = "Name of the Lambda function"
   type        = string
