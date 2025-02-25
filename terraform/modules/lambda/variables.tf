@@ -35,3 +35,8 @@ variable "api_stage" {
   type        = string
   default     = "dev"  # Default to "dev" if not provided
 }
+
+variable "account_id" {
+  description = "The AWS Account ID"
+  type        = string
+}
