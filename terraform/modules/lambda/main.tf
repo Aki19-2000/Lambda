@@ -1,3 +1,14 @@
+# Input variables for Lambda
+variable "patient_service_image_uri" {
+  description = "The ECR repository URL for the patient service Lambda function"
+  type        = string
+}
+
+variable "appointment_service_image_uri" {
+  description = "The ECR repository URL for the appointment service Lambda function"
+  type        = string
+}
+
 # Lambda execution IAM role
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-execution-role"
