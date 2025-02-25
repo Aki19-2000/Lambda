@@ -9,6 +9,11 @@ resource "aws_lambda_function" "this" {
       ENV = var.environment
     }
   }
+
+  # Enabling X-Ray tracing
+  tracing_config {
+    mode = "Active"  # This enables X-Ray tracing for the Lambda function
+  }
 }
 
 # API Gateway to trigger the Lambda function
