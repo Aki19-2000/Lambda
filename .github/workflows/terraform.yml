@@ -56,4 +56,4 @@ jobs:
         working-directory: terraform 
 
         env:
-          TF_VAR_account_id: ${{ secrets.account_id }}
+          TF_VAR_account_id: ${{ secrets. ACCOUNT_ID }}
