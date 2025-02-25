@@ -10,13 +10,9 @@ resource "aws_lambda_function" "this" {
     }
   }
 
-  # Add Dead Letter Queue and Retry Configuration for better fault tolerance (optional but recommended)
+  # Dead Letter Queue configuration (optional, based on requirement)
   dead_letter_config {
     target_arn = var.dlq_arn
-  }
-
-  retry {
-    attempts = 2  # Number of retry attempts in case of failure
   }
 }
 
