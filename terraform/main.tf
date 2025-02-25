@@ -35,12 +35,17 @@ resource "aws_api_gateway_integration" "patient_service_integration" {
   http_method          = aws_api_gateway_method.patient_service_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.patient_service.invoke_arn
+  uri                     = module.lambda.patient_service_invoke_arn  # Reference the output from Lambda module
+}
+
+resource "aws_api_gateway_stage" "patient_service_stage" {
+  rest_api_id = aws_api_gateway_rest_api.patient_service_api.id
+  stage_name  = "prod"
 }
 
 resource "aws_api_gateway_deployment" "patient_service_deployment" {
   rest_api_id = aws_api_gateway_rest_api.patient_service_api.id
-  stage_name  = "prod"
+  stage_name  = aws_api_gateway_stage.patient_service_stage.stage_name
 }
 
 # API Gateway for Appointment Service Lambda
@@ -68,10 +73,15 @@ resource "aws_api_gateway_integration" "appointment_service_integration" {
   http_method          = aws_api_gateway_method.appointment_service_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.appointment_service.invoke_arn
+  uri                     = module.lambda.appointment_service_invoke_arn  # Reference the output from Lambda module
+}
+
+resource "aws_api_gateway_stage" "appointment_service_stage" {
+  rest_api_id = aws_api_gateway_rest_api.appointment_service_api.id
+  stage_name  = "prod"
 }
 
 resource "aws_api_gateway_deployment" "appointment_service_deployment" {
   rest_api_id = aws_api_gateway_rest_api.appointment_service_api.id
-  stage_name  = "prod"
+  stage_name  = aws_api_gateway_stage.appointment_service_stage.stage_name
 }
