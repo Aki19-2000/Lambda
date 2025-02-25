@@ -1,0 +1,14 @@
+{
+  "name": "appointment-service",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "aws-sdk": "^2.983.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+}
