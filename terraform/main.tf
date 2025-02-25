@@ -22,6 +22,7 @@ resource "aws_api_gateway_resource" "patient_service_resource" {
   path_part   = "patient-service"
 }
 
+# Define the method for Patient Service Resource
 resource "aws_api_gateway_method" "patient_service_method" {
   rest_api_id   = aws_api_gateway_rest_api.patient_service_api.id
   resource_id   = aws_api_gateway_resource.patient_service_resource.id
@@ -29,6 +30,7 @@ resource "aws_api_gateway_method" "patient_service_method" {
   authorization = "NONE"
 }
 
+# API Gateway Integration for Patient Service Lambda
 resource "aws_api_gateway_integration" "patient_service_integration" {
   rest_api_id          = aws_api_gateway_rest_api.patient_service_api.id
   resource_id          = aws_api_gateway_resource.patient_service_resource.id
@@ -38,6 +40,7 @@ resource "aws_api_gateway_integration" "patient_service_integration" {
   uri                     = module.lambda.patient_service_invoke_arn  # Reference the output from Lambda module
 }
 
+# API Gateway Deployment for Patient Service Lambda
 resource "aws_api_gateway_deployment" "patient_service_deployment" {
   rest_api_id = aws_api_gateway_rest_api.patient_service_api.id
 }
@@ -60,6 +63,7 @@ resource "aws_api_gateway_resource" "appointment_service_resource" {
   path_part   = "appointment-service"
 }
 
+# Define the method for Appointment Service Resource
 resource "aws_api_gateway_method" "appointment_service_method" {
   rest_api_id   = aws_api_gateway_rest_api.appointment_service_api.id
   resource_id   = aws_api_gateway_resource.appointment_service_resource.id
@@ -67,6 +71,7 @@ resource "aws_api_gateway_method" "appointment_service_method" {
   authorization = "NONE"
 }
 
+# API Gateway Integration for Appointment Service Lambda
 resource "aws_api_gateway_integration" "appointment_service_integration" {
   rest_api_id          = aws_api_gateway_rest_api.appointment_service_api.id
   resource_id          = aws_api_gateway_resource.appointment_service_resource.id
@@ -76,6 +81,7 @@ resource "aws_api_gateway_integration" "appointment_service_integration" {
   uri                     = module.lambda.appointment_service_invoke_arn  # Reference the output from Lambda module
 }
 
+# API Gateway Deployment for Appointment Service Lambda
 resource "aws_api_gateway_deployment" "appointment_service_deployment" {
   rest_api_id = aws_api_gateway_rest_api.appointment_service_api.id
 }
