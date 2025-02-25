@@ -5,15 +5,13 @@ provider "aws" {
 
 # Lambda module reference
 module "lambda" {
-  source            = "./modules/lambda"
-  lambda_function_name = "myLambdaFunction"
-  iam_role_arn         = module.iam.lambda_role_arn
-  image_uri            = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
-  environment          = "dev"
-  dlq_arn              = ""  # Leave empty if you don't want to use a DLQ
-  region               = var.region
-  api_stage            = "prod"
-  account_id           = data.aws_caller_identity.current.account_id  # Use the dynamically fetched account ID
+  source               = "./modules/lambda"
+  lambda_function_name  = "myLambdaFunction"
+  iam_role_arn          = module.iam.lambda_role_arn
+  image_uri             = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
+  environment           = "dev"
+  api_stage             = "prod"
+  account_id            = ${{ secrets.ACCOUNT_ID }}  
 }
 
 # IAM module reference
