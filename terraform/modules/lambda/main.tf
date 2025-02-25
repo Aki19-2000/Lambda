@@ -9,6 +9,16 @@ variable "appointment_service_image_uri" {
   type        = string
 }
 
+variable "private_subnet_ids" {
+  description = "The subnet IDs where Lambda will run"
+  type        = list(string)
+}
+
+variable "lambda_security_group_id" {
+  description = "The security group ID for Lambda functions"
+  type        = string
+}
+
 # Lambda execution IAM role
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-execution-role"
