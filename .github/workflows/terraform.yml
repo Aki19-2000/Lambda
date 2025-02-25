@@ -20,6 +20,17 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
+      - name: Install TFLint
+        run: |
+          curl -Lo tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.29.0/tflint_linux_amd64.zip
+          unzip tflint.zip
+          sudo mv tflint /usr/local/bin/
+          tflint --version  # Confirm the TFLint installation
+
+      - name: Run TFLint
+        run: tflint
+        working-directory: terraform
+
       - name: Terraform Init
         run: terraform init
         working-directory: terraform 
