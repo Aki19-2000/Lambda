@@ -59,7 +59,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
 resource "aws_lambda_function" "patient_service" {
   function_name = "patient-service"
   role          = aws_iam_role.lambda_exec_role.arn
-  image_uri     = 510278866235.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest
+  image_uri     = "510278866235.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest"
   memory_size   = 128
   timeout       = 15
   package_type  = "Image"
@@ -81,7 +81,7 @@ resource "aws_lambda_function" "patient_service" {
 resource "aws_lambda_function" "appointment_service" {
   function_name = "appointment-service"
   role          = aws_iam_role.lambda_exec_role.arn
-  image_uri     = 510278866235.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest
+  image_uri     = "510278866235.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest"
   memory_size   = 128
   timeout       = 15
   package_type  = "Image"
