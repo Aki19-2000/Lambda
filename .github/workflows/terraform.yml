@@ -47,7 +47,7 @@ jobs:
         working-directory: terraform 
 
       - name: Terraform plan
-        run: terraform plan
+        run: -var="account_id=510278866235"
         working-directory: terraform 
 
       - name: Terraform apply
