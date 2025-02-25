@@ -28,7 +28,4 @@ jobs:
           docker build -t ${{ secrets.ECR_REGISTRY }}/patient-service:latest ./services/patient-service
           docker push ${{ secrets.ECR_REGISTRY }}/patient-service:latest
 
-      - name: Build and push Appointment Service Docker image
-        run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/appointment-service:latest ./services/appointment-service
-          docker push ${{ secrets.ECR_REGISTRY }}/appointment-service:latest
+     
