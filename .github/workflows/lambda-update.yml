@@ -1,0 +1,23 @@
+name: Update Lambda Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/**'
+
+jobs:
+  update-lambda:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update Patient Service Lambda
+        run: |
+          aws lambda update-function-code --function-name patient-service --image-uri ${{ secrets.ECR_REGISTRY }}/patient-service:latest
+
+      - name: Update Appointment Service Lambda
+        run: |
+          aws lambda update-function-code --function-name appointment-service --image-uri ${{ secrets.ECR_REGISTRY }}/appointment-service:latest
