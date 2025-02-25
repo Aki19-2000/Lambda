@@ -7,5 +7,4 @@ variable "region" {
 variable "account_id" {
   description = "The AWS Account ID"
   type        = string
-  default     = ${{ secrets.account_id}} 
 }
