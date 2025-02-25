@@ -1,9 +1,9 @@
 # Lambda Module
 module "lambda" {
   source = "./modules/lambda"
-  private_subnet_ids         = module.vpc.private_subnet_ids
-  lambda_security_group_id   = module.vpc.lambda_security_group_id
-  patient_service_image_uri  = "510278866235.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest"
+
+  # Pass the correct arguments from the VPC module and ECR image URLs
+  patient_service_image_uri    = "510278866235.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest"
   appointment_service_image_uri = "510278866235.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest"
 }
 
