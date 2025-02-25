@@ -1,3 +1,6 @@
+# Get the current AWS region
+data "aws_region" "current" {}
+
 # Lambda function using container image
 resource "aws_lambda_function" "helloworld_lambda" {
   function_name = "helloworld-lambda"
