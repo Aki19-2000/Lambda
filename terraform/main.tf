@@ -40,7 +40,6 @@ resource "aws_api_gateway_integration" "patient_service_integration" {
 
 resource "aws_api_gateway_deployment" "patient_service_deployment" {
   rest_api_id = aws_api_gateway_rest_api.patient_service_api.id
-  stage_name  = "prod"
 }
 
 resource "aws_api_gateway_stage" "patient_service_stage" {
@@ -79,7 +78,6 @@ resource "aws_api_gateway_integration" "appointment_service_integration" {
 
 resource "aws_api_gateway_deployment" "appointment_service_deployment" {
   rest_api_id = aws_api_gateway_rest_api.appointment_service_api.id
-  stage_name  = "prod"
 }
 
 resource "aws_api_gateway_stage" "appointment_service_stage" {
