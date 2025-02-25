@@ -1,3 +1,61 @@
+# IAM Role for Lambda Functions
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "lambda-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# IAM Policy for Lambda execution (write logs to CloudWatch and access ECR)
+resource "aws_iam_role_policy" "lambda_exec_policy" {
+  name = "lambda-execution-policy"
+  role = aws_iam_role.lambda_exec_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Action   = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        Effect   = "Allow"
+        Resource = aws_ecr_repository.patient_service.arn
+      },
+      {
+        Action   = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        Effect   = "Allow"
+        Resource = aws_ecr_repository.appointment_service.arn
+      }
+    ]
+  })
+}
+
+# Lambda function for Patient Service
 resource "aws_lambda_function" "patient_service" {
   function_name = "patient-service"
   role          = aws_iam_role.lambda_exec_role.arn
@@ -13,6 +71,7 @@ resource "aws_lambda_function" "patient_service" {
   }
 }
 
+# Lambda function for Appointment Service
 resource "aws_lambda_function" "appointment_service" {
   function_name = "appointment-service"
   role          = aws_iam_role.lambda_exec_role.arn
