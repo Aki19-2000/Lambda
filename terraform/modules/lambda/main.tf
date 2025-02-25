@@ -63,7 +63,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           "ecr:GetDownloadUrlForLayer"
         ]
         Effect   = "Allow"
-        Resource = var.patient_service_image_uri
+        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/patient-service"
       },
       {
         Action = [
@@ -72,7 +72,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           "ecr:GetDownloadUrlForLayer"
         ]
         Effect   = "Allow"
-        Resource = var.appointment_service_image_uri
+        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/appointment-service"
       },
       {
         Action = [
@@ -86,6 +86,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
     ]
   })
 }
+
 
 
 # Lambda function for Patient Service with VPC and Security Group
