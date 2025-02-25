@@ -17,4 +17,3 @@ variable "lambda_security_group_id" {
   description = "The security group ID for Lambda functions"
   type        = string
 }
-
