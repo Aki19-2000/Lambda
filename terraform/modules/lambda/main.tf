@@ -5,7 +5,11 @@ data "aws_region" "current" {}
 resource "aws_lambda_function" "helloworld_lambda" {
   function_name = "helloworld-lambda"
   
+  # Define the image URI from ECR
   image_uri = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
+  
+  # Specify package type as Image for container-based Lambda
+  package_type = "Image"
   
   memory_size = 128
   timeout     = 3
@@ -79,7 +83,14 @@ resource "aws_api_gateway_integration" "helloworld_integration" {
   uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${aws_lambda_function.helloworld_lambda.arn}/invocations"
 }
 
-# Deployment of API Gateway
+# Explicit API Gateway stage configuration
+resource "aws_api_gateway_stage" "helloworld_stage" {
+  stage_name    = "prod"
+  rest_api_id   = aws_api_gateway_rest_api.helloworld_api.id
+  deployment_id = aws_api_gateway_deployment.helloworld_deployment.id
+}
+
+# API Gateway deployment
 resource "aws_api_gateway_deployment" "helloworld_deployment" {
   rest_api_id = aws_api_gateway_rest_api.helloworld_api.id
   stage_name  = "prod"
