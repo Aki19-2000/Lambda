@@ -1,110 +1,70 @@
-# Input variables for Lambda
-variable "patient_service_image_uri" {
-  description = "The ECR repository URL for the patient service Lambda function"
-  type        = string
+resource "aws_ecr_repository" "helloworld_repo" {
+  name = "helloworldrepo"
 }
 
-variable "private_subnet_ids" {
-  description = "The subnet IDs where Lambda will run"
-  type        = list(string)
+resource "aws_lambda_function" "helloworld_lambda" {
+  function_name = "helloworld-lambda"
+  
+  image_uri = "${aws_ecr_repository.helloworld_repo.repository_url}:latest"
+  
+  memory_size = 128
+  timeout     = 3
+  
+  # IAM Role for Lambda (simple execution role)
+  role = aws_iam_role.lambda_exec_role.arn
 }
 
-variable "lambda_security_group_id" {
-  description = "The security group ID for Lambda functions"
-  type        = string
-}
-
-# Lambda execution IAM role
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda-execution-role"
-
+  name = "lambda_exec_role"
+  
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
-    ]
+      Effect    = "Allow"
+      Sid       = ""
+    }]
   })
 }
 
-# IAM Policy for Lambda execution (logs to CloudWatch, access to ECR, and EC2 permissions for network interfaces)
-resource "aws_iam_role_policy" "lambda_exec_policy" {
-  name = "lambda-execution-policy"
-  role = aws_iam_role.lambda_exec_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Effect   = "Allow"
-        Resource = "arn:aws:logs:*:*:*"
-      },
-      {
-        Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer"
-        ]
-        Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/patient-service"
-      },
-      {
-        Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer"
-        ]
-        Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/appointment-service"
-      },
-      {
-        Action = [
-          "ec2:CreateNetworkInterface",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DeleteNetworkInterface"
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      }
-    ]
-  })
+resource "aws_api_gateway_rest_api" "helloworld_api" {
+  name        = "helloworld-api"
+  description = "API for triggering helloworld Lambda"
 }
 
-# Lambda function for Patient Service
-resource "aws_lambda_function" "patient_service" {
-  function_name = "patient-service"
-  role          = aws_iam_role.lambda_exec_role.arn
-  image_uri     = var.patient_service_image_uri
-  memory_size   = 128
-  timeout       = 15
-  package_type  = "Image"
-
-  environment {
-    variables = {
-      LOG_LEVEL = "info"
-    }
-  }
-
-  vpc_config {
-    subnet_ids         = var.private_subnet_ids
-    security_group_ids = [var.lambda_security_group_id]
-  }
+resource "aws_api_gateway_resource" "helloworld_resource" {
+  rest_api_id = aws_api_gateway_rest_api.helloworld_api.id
+  parent_id   = aws_api_gateway_rest_api.helloworld_api.root_resource_id
+  path_part   = "hello"
 }
 
-
-
-# Output the Lambda invoke ARN for use in root module
-output "patient_service_invoke_arn" {
-  value = aws_lambda_function.patient_service.invoke_arn
+resource "aws_api_gateway_method" "helloworld_method" {
+  rest_api_id   = aws_api_gateway_rest_api.helloworld_api.id
+  resource_id   = aws_api_gateway_resource.helloworld_resource.id
+  http_method   = "GET"
+  authorization = "NONE"
 }
 
+resource "aws_api_gateway_integration" "helloworld_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.helloworld_api.id
+  resource_id             = aws_api_gateway_resource.helloworld_resource.id
+  http_method             = aws_api_gateway_method.helloworld_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${aws_lambda_function.helloworld_lambda.arn}/invocations"
+}
+
+resource "aws_api_gateway_deployment" "helloworld_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.helloworld_api.id
+  stage_name  = "prod"
+}
+
+resource "aws_lambda_permission" "allow_api_gateway" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  function_name = aws_lambda_function.helloworld_lambda.function_name
+}
