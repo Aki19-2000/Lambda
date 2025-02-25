@@ -2,15 +2,16 @@ resource "aws_lambda_function" "this" {
   function_name = var.lambda_function_name
   role          = var.iam_role_arn
   package_type  = "Image"
-  image_uri     = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
- 
+  image_uri     = var.image_uri
+
   environment {
     variables = {
-      ENV = "dev"
+      ENV = var.environment
     }
   }
 }
- 
+
+# API Gateway to trigger the Lambda function
 resource "aws_api_gateway_rest_api" "this" {
   name        = "${var.lambda_function_name}-api"
   description = "API Gateway to trigger ${var.lambda_function_name}"
@@ -38,20 +39,43 @@ resource "aws_api_gateway_integration" "this" {
   uri                     = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${aws_lambda_function.this.arn}/invocations"
 }
 
-# Grant API Gateway permissions to invoke the Lambda function
+# Lambda permissions for API Gateway to invoke the function
 resource "aws_lambda_permission" "this" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.this.function_name
   principal     = "apigateway.amazonaws.com"
 }
 
-output "api_gateway_url" {
-  value = "https://${aws_api_gateway_rest_api.this.id}.execute-api.${var.region}.amazonaws.com/prod/invoke"
+# Deploy API Gateway to a stage
+resource "aws_api_gateway_deployment" "this" {
+  rest_api_id = aws_api_gateway_rest_api.this.id
+  stage_name  = var.api_stage
+
+  depends_on = [
+    aws_api_gateway_integration.this,
+    aws_api_gateway_method.this
+  ]
 }
+
+# Optionally, you can define the deployment stage itself
+resource "aws_api_gateway_stage" "this" {
+  stage_name    = var.api_stage
+  rest_api_id   = aws_api_gateway_rest_api.this.id
+  deployment_id = aws_api_gateway_deployment.this.id
+
+  # Optional: Enable logging
+  logging_level = "INFO"
+  data_trace_enabled = true
+}
+
 output "lambda_invoke_arn" {
   value = aws_lambda_function.this.invoke_arn
 }
- 
+
 output "lambda_function_arn" {
   value = aws_lambda_function.this.arn
+}
+
+output "api_gateway_url" {
+  value = "https://${aws_api_gateway_rest_api.this.id}.execute-api.${var.region}.amazonaws.com/${var.api_stage}/invoke"
 }
