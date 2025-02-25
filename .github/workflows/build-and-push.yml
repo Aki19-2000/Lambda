@@ -13,6 +13,12 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::510278866235:role/OIDC-GitHUb
+          aws-region: us-east-1
+
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
