@@ -29,3 +29,9 @@ variable "dlq_arn" {
   type        = string
   default     = ""  # Default value is empty, can be updated when required
 }
+
+variable "api_stage" {
+  description = "The stage name for the API Gateway (e.g., dev, prod)"
+  type        = string
+  default     = "dev"  # Default to "dev" if not provided
+}
