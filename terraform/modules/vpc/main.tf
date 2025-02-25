@@ -1,22 +1,45 @@
-# VPC Configuration (Private Subnet)
+# VPC Definition
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_support = true
+  enable_dns_hostnames = true
 }
 
+# Public Subnet
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+}
+
+# Private Subnet
 resource "aws_subnet" "private_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = false
+  availability_zone       = "us-east-1b"
 }
 
 # Security Group for Lambda
 resource "aws_security_group" "lambda_sg" {
-  vpc_id      = aws_vpc.main.id
-  description = "Security group for Lambda functions"
+  vpc_id = aws_vpc.main.id
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+  }
 }
 
-# Output the subnet IDs and security group ID
+# Output VPC and Subnet IDs for use in Lambda Module
 output "private_subnet_ids" {
   value = [aws_subnet.private_subnet.id]
 }
