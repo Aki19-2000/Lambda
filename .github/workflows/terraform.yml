@@ -36,24 +36,24 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform 
+        working-directory: terraform
 
       - name: Terraform fmt
-        run: terraform fmt 
-        working-directory: terraform 
+        run: terraform fmt
+        working-directory: terraform
 
       - name: Terraform validate
         run: terraform validate
-        working-directory: terraform 
+        working-directory: terraform
 
       - name: Terraform plan
-        run: -var="account_id=510278866235"
-        working-directory: terraform 
+        run: terraform plan -var="account_id=510278866235" # Pass the account_id directly here
+        working-directory: terraform
 
       - name: Terraform apply
         run: terraform apply -auto-approve
         if: github.ref == 'refs/heads/main'
-        working-directory: terraform 
+        working-directory: terraform
 
         env:
-          TF_VAR_account_id: ${{ secrets. ACCOUNT_ID }}
+          TF_VAR_account_id: ${{ secrets.ACCOUNT_ID }} # This will ensure the account_id from secrets is passed to the Terraform configuration
