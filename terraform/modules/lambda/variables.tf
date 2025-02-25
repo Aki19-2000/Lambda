@@ -1,5 +1,5 @@
 variable "region" {
-  description = "The AWS region to deploy resources"
+  description = "AWS Region"
   type        = string
 }
 
@@ -14,29 +14,21 @@ variable "iam_role_arn" {
 }
 
 variable "image_uri" {
-  description = "URI for the container image in ECR"
+  description = "URI of the Docker image for Lambda function"
   type        = string
 }
 
 variable "environment" {
-  description = "Environment variable for Lambda (dev, prod, etc.)"
+  description = "Environment for Lambda"
   type        = string
-  default     = "dev"
-}
-
-variable "dlq_arn" {
-  description = "ARN of the Dead Letter Queue (optional)"
-  type        = string
-  default     = ""  # Default value is empty, can be updated when required
 }
 
 variable "api_stage" {
-  description = "The stage name for the API Gateway (e.g., dev, prod)"
+  description = "API Gateway stage"
   type        = string
-  default     = "dev"  # Default to "dev" if not provided
 }
 
 variable "account_id" {
-  description = "The AWS Account ID"
+  description = "AWS Account ID"
   type        = string
 }
