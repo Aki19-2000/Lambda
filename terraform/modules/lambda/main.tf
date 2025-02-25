@@ -35,7 +35,7 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
-# Attach permissions to the Lambda role (CloudWatch logs, ECR access, etc.)
+# Attach permissions to the Lambda role (CloudWatch logs)
 resource "aws_iam_role_policy" "lambda_logs_policy" {
   name = "lambda-logs-policy"
   role = aws_iam_role.lambda_exec_role.id
@@ -62,18 +62,27 @@ resource "aws_iam_role_policy" "lambda_ecr_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # Allow Lambda to authenticate with ECR
       {
         Action   = "ecr:GetAuthorizationToken"
         Effect   = "Allow"
         Resource = "*"
       },
+      # Allow Lambda to pull images from the specific ECR repository
       {
         Action   = "ecr:BatchGetImage"
         Effect   = "Allow"
         Resource = "arn:aws:ecr:us-east-1:510278866235:repository/helloworld"
       },
+      # Allow Lambda to pull any image tagged with 'latest' from the repository
       {
         Action   = "ecr:BatchGetImage"
+        Effect   = "Allow"
+        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/helloworld/*"
+      },
+      # Allow Lambda to fetch image layer data from ECR
+      {
+        Action   = "ecr:GetDownloadUrlForLayer"
         Effect   = "Allow"
         Resource = "arn:aws:ecr:us-east-1:510278866235:repository/helloworld/*"
       }
