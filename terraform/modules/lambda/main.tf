@@ -1,7 +1,3 @@
-resource "aws_ecr_repository" "helloworld_repo" {
-  name = "helloworldrepo"
-}
-
 resource "aws_lambda_function" "helloworld_lambda" {
   function_name = "helloworld-lambda"
   
