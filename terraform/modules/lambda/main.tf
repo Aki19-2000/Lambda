@@ -1,4 +1,4 @@
-# IAM Role for Lambda Functions
+# Lambda execution IAM role
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-execution-role"
 
@@ -34,7 +34,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
         Resource = "arn:aws:logs:*:*:*"
       },
       {
-        Action   = [
+        Action = [
           "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer"
@@ -43,7 +43,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
         Resource = aws_ecr_repository.patient_service.arn
       },
       {
-        Action   = [
+        Action = [
           "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer"
@@ -55,7 +55,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
   })
 }
 
-# Lambda function for Patient Service
+# Lambda function for Patient Service with VPC and Security Group
 resource "aws_lambda_function" "patient_service" {
   function_name = "patient-service"
   role          = aws_iam_role.lambda_exec_role.arn
@@ -69,9 +69,15 @@ resource "aws_lambda_function" "patient_service" {
       LOG_LEVEL = "info"
     }
   }
+
+  # VPC Configuration for Lambda
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_subnet.id]   # Add private subnets here
+    security_group_ids = [aws_security_group.lambda_sg.id]  # Reference the Lambda SG
+  }
 }
 
-# Lambda function for Appointment Service
+# Lambda function for Appointment Service with VPC and Security Group
 resource "aws_lambda_function" "appointment_service" {
   function_name = "appointment-service"
   role          = aws_iam_role.lambda_exec_role.arn
@@ -84,5 +90,11 @@ resource "aws_lambda_function" "appointment_service" {
     variables = {
       LOG_LEVEL = "info"
     }
+  }
+
+  # VPC Configuration for Lambda
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_subnet.id]   # Add private subnets here
+    security_group_ids = [aws_security_group.lambda_sg.id]  # Reference the Lambda SG
   }
 }
