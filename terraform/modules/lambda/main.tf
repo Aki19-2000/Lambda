@@ -57,31 +57,6 @@ resource "aws_api_gateway_deployment" "this" {
   ]
 }
 
-# API Gateway stage with logging settings
-resource "aws_api_gateway_stage" "this" {
-  stage_name    = var.api_stage
-  rest_api_id   = aws_api_gateway_rest_api.this.id
-  deployment_id = aws_api_gateway_deployment.this.id
-
-  # Configure access log settings for the stage (optional)
-  access_log_settings {
-    destination_arn = "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/api-gateway/${var.api_stage}"
-    format          = jsonencode({
-      requestId     = "$context.requestId"
-      ip            = "$context.identity.sourceIp"
-      userAgent     = "$context.identity.userAgent"
-      method        = "$context.httpMethod"
-      resourcePath  = "$context.resourcePath"
-      status        = "$context.status"
-      responseTime  = "$context.responseLatency"
-    })
-  }
-
-  # Optional: Enable caching if needed
-  caching_enabled      = true
-  cache_ttl_in_seconds = 3600
-}
-
 output "lambda_invoke_arn" {
   value = aws_lambda_function.this.invoke_arn
 }
