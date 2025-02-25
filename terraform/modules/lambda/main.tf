@@ -4,11 +4,6 @@ variable "patient_service_image_uri" {
   type        = string
 }
 
-variable "appointment_service_image_uri" {
-  description = "The ECR repository URL for the appointment service Lambda function"
-  type        = string
-}
-
 variable "private_subnet_ids" {
   description = "The subnet IDs where Lambda will run"
   type        = list(string)
@@ -106,32 +101,10 @@ resource "aws_lambda_function" "patient_service" {
   }
 }
 
-# Lambda function for Appointment Service
-resource "aws_lambda_function" "appointment_service" {
-  function_name = "appointment-service"
-  role          = aws_iam_role.lambda_exec_role.arn
-  image_uri     = var.appointment_service_image_uri
-  memory_size   = 128
-  timeout       = 15
-  package_type  = "Image"
 
-  environment {
-    variables = {
-      LOG_LEVEL = "info"
-    }
-  }
-
-  vpc_config {
-    subnet_ids         = var.private_subnet_ids
-    security_group_ids = [var.lambda_security_group_id]
-  }
-}
 
 # Output the Lambda invoke ARN for use in root module
 output "patient_service_invoke_arn" {
   value = aws_lambda_function.patient_service.invoke_arn
 }
 
-output "appointment_service_invoke_arn" {
-  value = aws_lambda_function.appointment_service.invoke_arn
-}
