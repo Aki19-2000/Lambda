@@ -1,11 +1,7 @@
 name: Update Lambda Functions
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'services/**'
+  workflow_dispatch:
 
 jobs:
   update-lambda:
