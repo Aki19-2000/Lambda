@@ -16,6 +16,12 @@ resource "aws_lambda_function" "this" {
   }
 }
 
+# IAM Role Policy Attachment to allow Lambda to send data to X-Ray
+resource "aws_iam_role_policy_attachment" "lambda_xray_policy" {
+  role       = var.iam_role_arn  # Lambda execution role
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSXRayDaemonWriteAccess"  # Policy to allow Lambda to write traces to X-Ray
+}
+
 # API Gateway to trigger the Lambda function
 resource "aws_api_gateway_rest_api" "this" {
   name        = "${var.lambda_function_name}-api"
