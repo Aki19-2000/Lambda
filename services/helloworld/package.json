@@ -1,10 +1,6 @@
 {
   "name": "helloworld-lambda",
   "version": "1.0.0",
-  "description": "A simple Lambda function",
   "main": "app.js",
-  "scripts": {
-    "start": "node app.js"
-  },
   "dependencies": {}
 }
