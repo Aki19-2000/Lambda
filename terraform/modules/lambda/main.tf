@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "helloworld_lambda" {
   function_name = "helloworld-lambda"
   
-  image_uri = "${aws_ecr_repository.helloworld_repo.repository_url}:latest"
+  image_uri = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
   
   memory_size = 128
   timeout     = 3
