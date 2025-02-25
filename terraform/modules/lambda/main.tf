@@ -78,8 +78,8 @@ resource "aws_api_gateway_stage" "this" {
   }
 
   # Optional: Enable caching if needed
-  caching_enabled = true
-  cache_ttl_in_seconds = 3600
+  caching_enabled        = true
+  cache_ttl_in_seconds   = 3600
 }
 
 output "lambda_invoke_arn" {
