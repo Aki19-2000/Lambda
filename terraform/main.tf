@@ -13,7 +13,7 @@ module "lambda" {
   dlq_arn              = ""  # Leave empty if you don't want to use a DLQ
   region               = var.region
   api_stage            = "prod"
-  account_id           = var.account_id  # Pass the account ID here
+  account_id           = data.aws_caller_identity.current.account_id  # Use the dynamically fetched account ID
 }
 
 # IAM module reference
