@@ -1,7 +1,7 @@
 FROM public.ecr.aws/lambda/nodejs:14
 
 # Install dependencies
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install
 
 # Copy the application code
