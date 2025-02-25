@@ -14,10 +14,6 @@ module "lambda" {
   lambda_security_group_id    = module.vpc.lambda_security_group_id
 }
 
-# VPC Module
-module "vpc" {
-  source = "./modules/vpc"
-}
 
 # API Gateway for Patient Service Lambda
 resource "aws_api_gateway_rest_api" "patient_service_api" {
