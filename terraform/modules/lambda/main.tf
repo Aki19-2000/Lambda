@@ -2,46 +2,44 @@
 data "aws_region" "current" {}
 
 # Lambda function using container image
-resource "aws_lambda_function" "helloworld_lambda" {
-  function_name = "helloworld-lambda"
-  
-  # Reference the newly pushed image in ECR
-  image_uri = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
-  
-  # Specify package type as Image for container-based Lambda
-  package_type = "Image"
-  
-  memory_size = 128
-  timeout     = 3
-  
-  # IAM Role for Lambda (with added permissions)
-  role = aws_iam_role.lambda_exec_role.arn
+resource "aws_lambda_function" "my_lambda" {
+  function_name = "my_lambda_function"
+  role          = aws_iam_role.lambda_exec.arn
+  package_type  = "Image"
+  image_uri     = "510278866235.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/helloworld:latest"
+
+  environment {
+    variables = {
+      ENV_VAR = "value"
+    }
+  }
 }
 
 # IAM Role for Lambda Execution
-resource "aws_iam_role" "lambda_exec_role" {
+resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
-  
+
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [ {
-      Action    = "sts:AssumeRole"
-      Principal = {
-        Service = "lambda.amazonaws.com"
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
       }
-      Effect    = "Allow"
-      Sid       = ""
-    }]
+    ]
   })
 }
 
 # Attach permissions to the Lambda role (CloudWatch logs)
 resource "aws_iam_role_policy" "lambda_logs_policy" {
   name = "lambda-logs-policy"
-  role = aws_iam_role.lambda_exec_role.id
+  role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [{
       Action   = [
         "logs:CreateLogGroup",
@@ -57,34 +55,34 @@ resource "aws_iam_role_policy" "lambda_logs_policy" {
 # Attach permissions for ECR to Lambda role
 resource "aws_iam_role_policy" "lambda_ecr_policy" {
   name = "lambda-ecr-policy"
-  role = aws_iam_role.lambda_exec_role.id
+  role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       # Allow Lambda to authenticate with ECR
       {
-        Action   = "ecr:GetAuthorizationToken"
-        Effect   = "Allow"
+        Action   = "ecr:GetAuthorizationToken",
+        Effect   = "Allow",
         Resource = "*"
       },
       # Allow Lambda to pull images from the specific ECR repository
       {
-        Action   = "ecr:BatchGetImage"
-        Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/helloworld"
+        Action   = "ecr:BatchGetImage",
+        Effect   = "Allow",
+        Resource = "arn:aws:ecr:${data.aws_region.current.name}:510278866235:repository/helloworld"
       },
       # Allow Lambda to pull any image tagged with 'latest' from the repository
       {
-        Action   = "ecr:BatchGetImage"
-        Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/helloworld/*"
+        Action   = "ecr:BatchGetImage",
+        Effect   = "Allow",
+        Resource = "arn:aws:ecr:${data.aws_region.current.name}:510278866235:repository/helloworld/*"
       },
       # Allow Lambda to fetch image layer data from ECR
       {
-        Action   = "ecr:GetDownloadUrlForLayer"
-        Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/helloworld/*"
+        Action   = "ecr:GetDownloadUrlForLayer",
+        Effect   = "Allow",
+        Resource = "arn:aws:ecr:${data.aws_region.current.name}:510278866235:repository/helloworld/*"
       }
     ]
   })
@@ -118,7 +116,7 @@ resource "aws_api_gateway_integration" "helloworld_integration" {
   http_method             = aws_api_gateway_method.helloworld_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${aws_lambda_function.helloworld_lambda.arn}/invocations"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${aws_lambda_function.my_lambda.arn}/invocations"
 }
 
 # Explicit API Gateway stage configuration (no deprecated "stage_name")
@@ -144,5 +142,5 @@ resource "aws_lambda_permission" "allow_api_gateway" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
-  function_name = aws_lambda_function.helloworld_lambda.function_name
+  function_name = aws_lambda_function.my_lambda.function_name
 }
