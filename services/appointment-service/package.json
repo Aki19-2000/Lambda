@@ -2,9 +2,9 @@
   "name": "appointment-service",
   "version": "1.0.0",
   "description": "Appointment service for healthcare application",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "express": "^4.17.1"
