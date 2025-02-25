@@ -6,7 +6,7 @@ resource "aws_lambda_function" "my_lambda" {
   function_name = "my_lambda_function"
   role          = aws_iam_role.lambda_exec.arn
   package_type  = "Image"
-  image_uri     = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
+  image_uri     = "510278866235.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/helloworld:latest"
 
   environment {
     variables = {
@@ -68,21 +68,13 @@ resource "aws_iam_role_policy" "lambda_ecr_policy" {
       },
       # Allow Lambda to pull images from the specific ECR repository
       {
-        Action   = "ecr:BatchGetImage",
+        Action   = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer"
+        ],
         Effect   = "Allow",
         Resource = "arn:aws:ecr:${data.aws_region.current.name}:510278866235:repository/helloworld"
-      },
-      # Allow Lambda to pull any image tagged with 'latest' from the repository
-      {
-        Action   = "ecr:BatchGetImage",
-        Effect   = "Allow",
-        Resource = "arn:aws:ecr:${data.aws_region.current.name}:510278866235:repository/helloworld/*"
-      },
-      # Allow Lambda to fetch image layer data from ECR
-      {
-        Action   = "ecr:GetDownloadUrlForLayer",
-        Effect   = "Allow",
-        Resource = "arn:aws:ecr:${data.aws_region.current.name}:510278866235:repository/helloworld/*"
       }
     ]
   })
