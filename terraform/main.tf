@@ -11,12 +11,12 @@ module "lambda" {
   image_uri             = "510278866235.dkr.ecr.us-east-1.amazonaws.com/helloworld:latest"
   environment           = "dev"
   api_stage             = "prod"
-  account_id            = ${{ secrets.ACCOUNT_ID }}  
+  account_id            = var.account_id  # Pass the account_id from a variable
 }
 
 # IAM module reference
 module "iam" {
-  source = "./modules/iam"
+  source               = "./modules/iam"
   lambda_function_name = "myLambdaFunction"
 }
 
