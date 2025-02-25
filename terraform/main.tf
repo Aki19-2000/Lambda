@@ -1,13 +1,20 @@
-module "vpc" {
-  source = "./modules/vpc"
+# Provider setup
+provider "aws" {
+  region = "us-east-1"
 }
 
+# Lambda Module
 module "lambda" {
   source = "./modules/lambda"
   private_subnet_ids         = module.vpc.private_subnet_ids
   lambda_security_group_id   = module.vpc.lambda_security_group_id
   patient_service_image_uri  = "510278866235.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest"
   appointment_service_image_uri = "510278866235.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest"
+}
+
+# VPC Module
+module "vpc" {
+  source = "./modules/vpc"
 }
 
 # API Gateway for Patient Service Lambda
@@ -22,33 +29,26 @@ resource "aws_api_gateway_resource" "patient_service_resource" {
   path_part   = "patient-service"
 }
 
-# Define the method for Patient Service Resource
 resource "aws_api_gateway_method" "patient_service_method" {
   rest_api_id   = aws_api_gateway_rest_api.patient_service_api.id
   resource_id   = aws_api_gateway_resource.patient_service_resource.id
-  http_method   = "GET"
+  http_method   = "POST"
   authorization = "NONE"
 }
 
-# API Gateway Integration for Patient Service Lambda
 resource "aws_api_gateway_integration" "patient_service_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.patient_service_api.id
-  resource_id          = aws_api_gateway_resource.patient_service_resource.id
-  http_method          = aws_api_gateway_method.patient_service_method.http_method
+  rest_api_id             = aws_api_gateway_rest_api.patient_service_api.id
+  resource_id             = aws_api_gateway_resource.patient_service_resource.id
+  http_method             = aws_api_gateway_method.patient_service_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = module.lambda.patient_service_invoke_arn  # Reference the output from Lambda module
+  uri                     = module.lambda.patient_service_invoke_arn
 }
 
-# API Gateway Deployment for Patient Service Lambda
 resource "aws_api_gateway_deployment" "patient_service_deployment" {
+  depends_on = [aws_api_gateway_integration.patient_service_integration]
   rest_api_id = aws_api_gateway_rest_api.patient_service_api.id
-}
-
-resource "aws_api_gateway_stage" "patient_service_stage" {
-  rest_api_id   = aws_api_gateway_rest_api.patient_service_api.id
-  stage_name    = "prod"
-  deployment_id = aws_api_gateway_deployment.patient_service_deployment.id  # Reference deployment_id
+  stage_name  = "prod"
 }
 
 # API Gateway for Appointment Service Lambda
@@ -63,31 +63,24 @@ resource "aws_api_gateway_resource" "appointment_service_resource" {
   path_part   = "appointment-service"
 }
 
-# Define the method for Appointment Service Resource
 resource "aws_api_gateway_method" "appointment_service_method" {
   rest_api_id   = aws_api_gateway_rest_api.appointment_service_api.id
   resource_id   = aws_api_gateway_resource.appointment_service_resource.id
-  http_method   = "GET"
+  http_method   = "POST"
   authorization = "NONE"
 }
 
-# API Gateway Integration for Appointment Service Lambda
 resource "aws_api_gateway_integration" "appointment_service_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.appointment_service_api.id
-  resource_id          = aws_api_gateway_resource.appointment_service_resource.id
-  http_method          = aws_api_gateway_method.appointment_service_method.http_method
+  rest_api_id             = aws_api_gateway_rest_api.appointment_service_api.id
+  resource_id             = aws_api_gateway_resource.appointment_service_resource.id
+  http_method             = aws_api_gateway_method.appointment_service_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = module.lambda.appointment_service_invoke_arn  # Reference the output from Lambda module
+  uri                     = module.lambda.appointment_service_invoke_arn
 }
 
-# API Gateway Deployment for Appointment Service Lambda
 resource "aws_api_gateway_deployment" "appointment_service_deployment" {
+  depends_on = [aws_api_gateway_integration.appointment_service_integration]
   rest_api_id = aws_api_gateway_rest_api.appointment_service_api.id
-}
-
-resource "aws_api_gateway_stage" "appointment_service_stage" {
-  rest_api_id   = aws_api_gateway_rest_api.appointment_service_api.id
-  stage_name    = "prod"
-  deployment_id = aws_api_gateway_deployment.appointment_service_deployment.id  # Reference deployment_id
+  stage_name  = "prod"
 }
