@@ -1,8 +1,3 @@
-# Provider setup
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Lambda Module
 module "lambda" {
   source = "./modules/lambda"
