@@ -3,12 +3,13 @@ provider "aws" {
   region = var.region
 }
 
-# Lambda module reference
+# IAM module reference
 module "iam" {
   source = "./modules/iam"
   lambda_function_name = "myLambdaFunction"
 }
 
+# Lambda module reference
 module "lambda" {
   source = "./modules/lambda"
   lambda_function_name = "myLambdaFunction"
