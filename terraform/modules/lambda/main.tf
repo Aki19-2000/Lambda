@@ -38,8 +38,7 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
-# IAM Policy for Lambda execution (write logs to CloudWatch and access ECR)
-# IAM Policy for Lambda execution (write logs to CloudWatch and access ECR)
+# IAM Policy for Lambda execution (logs to CloudWatch, access to ECR, and EC2 permissions for network interfaces)
 resource "aws_iam_role_policy" "lambda_exec_policy" {
   name = "lambda-execution-policy"
   role = aws_iam_role.lambda_exec_role.id
@@ -63,7 +62,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           "ecr:GetDownloadUrlForLayer"
         ]
         Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/patient-service"
+        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/patient-service"  # Correct ECR ARN
       },
       {
         Action = [
@@ -72,7 +71,7 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
           "ecr:GetDownloadUrlForLayer"
         ]
         Effect   = "Allow"
-        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/appointment-service"
+        Resource = "arn:aws:ecr:us-east-1:510278866235:repository/appointment-service"  # Correct ECR ARN
       },
       {
         Action = [
@@ -86,8 +85,6 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
     ]
   })
 }
-
-
 
 # Lambda function for Patient Service with VPC and Security Group
 resource "aws_lambda_function" "patient_service" {
