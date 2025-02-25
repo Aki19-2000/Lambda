@@ -1,0 +1,31 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/**'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Patient Service Docker image
+        run: |
+          docker build -t ${{ secrets.ECR_REGISTRY }}/patient-service:latest ./services/patient-service
+          docker push ${{ secrets.ECR_REGISTRY }}/patient-service:latest
+
+      - name: Build and push Appointment Service Docker image
+        run: |
+          docker build -t ${{ secrets.ECR_REGISTRY }}/appointment-service:latest ./services/appointment-service
+          docker push ${{ secrets.ECR_REGISTRY }}/appointment-service:latest
