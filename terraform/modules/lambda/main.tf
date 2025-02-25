@@ -10,9 +10,12 @@ resource "aws_lambda_function" "this" {
     }
   }
 
-  # Dead Letter Queue configuration (optional, based on requirement)
-  dead_letter_config {
-    target_arn = var.dlq_arn
+  # Conditionally add Dead Letter Queue configuration if dlq_arn is set
+  dynamic "dead_letter_config" {
+    for_each = var.dlq_arn != "" ? [1] : []
+    content {
+      target_arn = var.dlq_arn
+    }
   }
 }
 
