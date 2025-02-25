@@ -23,9 +23,7 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push Patient Service Docker image
+      - name: Build and push HelloWorld Lambda Docker image
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/patient-service:latest ./services/patient-service
-          docker push ${{ secrets.ECR_REGISTRY }}/patient-service:latest
-
-     
+          docker build -t ${{ secrets.ECR_REGISTRY }}/helloworld:latest ./services/helloworld
+          docker push ${{ secrets.ECR_REGISTRY }}/helloworld:latest
