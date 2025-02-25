@@ -12,6 +12,7 @@ module "lambda" {
   environment          = "dev"
   dlq_arn              = ""  # Leave empty if you don't want to use a DLQ
   region               = var.region  # Pass the region here
+  api_stage            = "prod"  # Specify the deployment stage (can be dev, prod, etc.)
 }
 
 # IAM module reference
